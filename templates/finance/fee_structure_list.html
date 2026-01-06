@@ -23,33 +23,48 @@
                 <th style="padding: 1rem; text-align: left; color: var(--text-muted); padding-left: 2rem;">Due Date</th>
             </tr>
         </thead>
-        <tbody>
-            {% for fee in fees %}
-            <tr style="border-bottom: 1px solid var(--border-color);">
-                <td style="padding: 1rem; font-weight: 500;">{{ fee.term.name }}</td>
-                <td style="padding: 1rem;">
-                    <span
-                        style="background: var(--bg-body); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.875rem;">{{
-                        fee.student_class.name }}</span>
-                </td>
-                <td style="padding: 1rem;">{{ fee.description }}</td>
-                <td style="padding: 1rem; text-align: right; font-weight: 600;">${{ fee.amount }}</td>
-                <td style="padding: 1rem; padding-left: 2rem;">{{ fee.due_date|default:"-" }}</td>
-                <td style="padding: 1rem;">
-                    <a href="{% url 'apply_fee_structure' fee.id %}"
-                        onclick="return confirm('Are you sure you want to invoice ALL students in {{ fee.student_class.name }} for this fee?');"
-                        style="background: var(--primary-light); color: var(--primary-color); padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: 600; font-size: 0.8rem;">
-                        Apply to Class
-                    </a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5" style="padding: 2rem; text-align: center; color: var(--text-muted);">
-                    No fees defined yet. Click "Add New Fee" to start.
-                </td>
-            </tr>
-            {% endfor %}
+        {% for item in fees_data %}
+        <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 1rem; font-weight: 500;">{{ item.fee.term.name }}</td>
+            <td style="padding: 1rem;">
+                <span
+                    style="background: var(--bg-body); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.875rem;">
+                    {{ item.fee.student_class.name }}</span>
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+                    {{ item.total_students }} Student(s)
+                </div>
+            </td>
+            <td style="padding: 1rem;">{{ item.fee.description }}</td>
+            <td style="padding: 1rem; text-align: right; font-weight: 600;">${{ item.fee.amount }}</td>
+            <td style="padding: 1rem; padding-left: 2rem;">{{ item.fee.due_date|default:"-" }}</td>
+            <td style="padding: 1rem;">
+                {% if item.pending_count > 0 %}
+                <a href="{% url 'apply_fee_structure' item.fee.id %}"
+                    onclick="return confirm('Invoice {{ item.pending_count }} NEW student(s) in {{ item.fee.student_class.name }}?');"
+                    style="display: inline-block; background: var(--primary-color); color: white; padding: 0.4rem 0.8rem; border-radius: 4px; font-weight: 600; font-size: 0.8rem; text-decoration: none;">
+                    {% if item.invoiced_count == 0 %}
+                    Apply to Class
+                    {% else %}
+                    Apply (+{{ item.pending_count }} New)
+                    {% endif %}
+                </a>
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+                    {{ item.invoiced_count }} / {{ item.total_students }} Invoiced
+                </div>
+                {% else %}
+                <span style="color: var(--success); font-weight: 600; font-size: 0.85rem;">
+                    <i class="ph ph-check"></i> Fully Applied
+                </span>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                No fees defined yet. Click "Add New Fee" to start.
+            </td>
+        </tr>
+        {% endfor %}
         </tbody>
     </table>
 </div>

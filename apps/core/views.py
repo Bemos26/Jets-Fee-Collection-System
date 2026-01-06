@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 
 from django.db.models import Sum
@@ -24,6 +24,10 @@ def home(request):
     total_invoiced = Transaction.objects.filter(
         transaction_type=Transaction.TransactionType.INVOICE
     ).aggregate(Sum('amount'))['amount__sum'] or 0
+    
+    # === DISPATCHER LOGIC ===
+    if request.user.role == 'STUDENT':
+        return redirect('student_portal')
     
     context = {
         'total_students': total_students,

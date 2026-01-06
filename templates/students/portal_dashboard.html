@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}My Portal - Jets Fees{% endblock %}
+{% block page_title %}Student Portal{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+
+    <!-- Left Column: Transactions & History -->
+    <div>
+        <div class="card"
+            style="background: white; padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); margin-bottom: 2rem;">
+            <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div
+                    style="width: 60px; height: 60px; background: var(--primary-main); color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 600; background: var(--bg-body);">
+                    {{ student.first_name|make_list|first }}{{ student.last_name|make_list|first }}
+                </div>
+                <div>
+                    <h2 style="font-size: 1.5rem; color: var(--text-main);">Welcome, {{ student.first_name }}!</h2>
+                    <div style="color: var(--text-muted);">{{ student.current_class.name }} |
+                        {{ student.admission_number }}</div>
+                </div>
+            </div>
+
+            <h3
+                style="font-size: 1.1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                Recent Activity</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="text-align: left; color: var(--text-muted); font-size: 0.9rem;">
+                        <th style="padding: 0.75rem 0;">Date</th>
+                        <th style="padding: 0.75rem 0;">Description</th>
+                        <th style="padding: 0.75rem 0; text-align: right;">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in student.transactions.all|slice:":10" %}
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td style="padding: 1rem 0;">{{ transaction.date|date:"M d, Y" }}</td>
+                        <td style="padding: 1rem 0;">
+                            <div style="font-weight: 500;">{{ transaction.description }}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">{{ transaction.reference_number }}
+                            </div>
+                        </td>
+                        <td
+                            style="padding: 1rem 0; text-align: right; font-weight: 600; color: {% if transaction.transaction_type == 'INVOICE' %}var(--danger){% else %}var(--success){% endif %};">
+                            {% if transaction.transaction_type == 'INVOICE' %}-{% else %}+{% endif %}$
+                            {{ transaction.amount }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="padding: 2rem; text-align: center; color: var(--text-muted);">No activity
+                            found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Right Column: Balance & Status -->
+    <div>
+        <div class="card"
+            style="background: white; padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); text-align: center;">
+            <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">Current Balance</div>
+            <div
+                style="font-size: 2.5rem; font-weight: 700; color: {% if student.current_balance > 0 %}var(--danger){% else %}var(--success){% endif %}; margin-bottom: 1.5rem;">
+                ${{ student.current_balance }}
+            </div>
+
+            {% if student.current_balance > 0 %}
+            <div
+                style="background: var(--danger-light); color: var(--danger); padding: 1rem; border-radius: var(--radius-md); font-size: 0.9rem; margin-bottom: 1.5rem;">
+                <i class="ph ph-warning-circle" style="vertical-align: middle; margin-right: 0.25rem;"></i> You have
+                pending fees.
+            </div>
+            {% else %}
+            <div
+                style="background: var(--success-light); color: var(--success); padding: 1rem; border-radius: var(--radius-md); font-size: 0.9rem; margin-bottom: 1.5rem;">
+                <i class="ph ph-check-circle" style="vertical-align: middle; margin-right: 0.25rem;"></i> Fees are up to
+                date!
+            </div>
+            {% endif %}
+
+            <button disabled
+                style="width: 100%; padding: 1rem; background: var(--bg-body); color: var(--text-muted); border: none; border-radius: var(--radius-md); font-weight: 600; cursor: not-allowed;">
+                Pay Online (Coming Soon)
+            </button>
+        </div>
+
+        <div class="card"
+            style="background: white; padding: 1.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); margin-top: 1.5rem;">
+            <h3 style="font-size: 1rem; margin-bottom: 1rem; color: var(--text-muted);">Contact School</h3>
+            <div style="font-size: 0.9rem; line-height: 1.6;">
+                Need help with your fees?<br>
+                <strong>Bursar Office:</strong><br>
+                +254 700 000 000<br>
+                finance@jets.edu
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

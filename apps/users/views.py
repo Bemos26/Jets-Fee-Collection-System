@@ -1,6 +1,7 @@
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
+from django.contrib.auth.decorators import login_required
 from .forms import LoginForm
 
 class CustomLoginView(LoginView):
@@ -22,3 +23,11 @@ def custom_logout_view(request):
     from django.contrib.auth import logout
     logout(request)
     return redirect('login')
+
+@login_required
+def settings_view(request):
+    """
+    User settings page.
+    """
+    # We can add profile update logic here later.
+    return render(request, 'users/settings.html')

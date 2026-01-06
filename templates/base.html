@@ -26,6 +26,17 @@
 
             <nav class="sidebar-nav">
                 <ul>
+                    {% if user.role == 'STUDENT' %}
+                    <!-- Student Navigation -->
+                    <li><a href="{% url 'student_portal' %}" class="{% if 'portal' in request.path %}active{% endif %}">
+                            <i class="ph ph-squares-four"></i> My Portal
+                        </a></li>
+
+                    <li><a href="{% url 'settings' %}" class="{% if 'settings' in request.path %}active{% endif %}">
+                            <i class="ph ph-gear"></i> Settings
+                        </a></li>
+                    {% else %}
+                    <!-- Admin / Staff Navigation -->
                     <li><a href="{% url 'home' %}"
                             class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">
                             <i class="ph ph-squares-four"></i> Dashboard
@@ -40,11 +51,16 @@
                             <i class="ph ph-money"></i> Fees & Finance
                         </a></li>
 
-                    <li><a href="#"><i class="ph ph-scroll"></i> Reports</a></li>
+                    <li><a href="{% url 'reports' %}" class="{% if 'reports' in request.path %}active{% endif %}">
+                            <i class="ph ph-scroll"></i> Reports
+                        </a></li>
 
                     <li class="nav-divider"></li>
 
-                    <li><a href="#"><i class="ph ph-gear"></i> Settings</a></li>
+                    <li><a href="{% url 'settings' %}" class="{% if 'settings' in request.path %}active{% endif %}">
+                            <i class="ph ph-gear"></i> Settings
+                        </a></li>
+                    {% endif %}
 
                     {% if user.is_authenticated %}
                     <li><a href="{% url 'logout' %}"><i class="ph ph-sign-out"></i> Logout</a></li>

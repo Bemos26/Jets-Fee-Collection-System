@@ -39,8 +39,8 @@
                 <td style="padding: 1rem;">
                     {% if student.current_class %}
                     <span
-                        style="background: var(--bg-body); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.875rem;">{{
-                        student.current_class.name }}</span>
+                        style="background: var(--bg-body); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.875rem;">
+                        {{ student.current_class.name }}</span>
                     {% else %}
                     <span style="color: var(--text-muted);">-</span>
                     {% endif %}
@@ -51,8 +51,11 @@
                     </div>
                 </td>
                 <td style="padding: 1rem; text-align: right;">
-                    <!-- Placeholder for Edit/View buttons -->
-                    <a href="#" style="color: var(--primary-color);"><i class="ph ph-pencil-simple"></i></a>
+                    <a href="{% url 'student_update' student.id %}"
+                        style="color: var(--primary-color); margin-right: 0.5rem;" title="Edit"><i
+                            class="ph ph-pencil-simple"></i></a>
+                    <a href="{% url 'student_detail' student.id %}" style="color: var(--text-muted);"
+                        title="View Details"><i class="ph ph-eye"></i></a>
                 </td>
             </tr>
             {% empty %}
