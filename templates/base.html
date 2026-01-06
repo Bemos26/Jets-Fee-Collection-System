@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}School Fees System{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- Google Fonts for Premium Look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons (Phosphor Icons - clean and modern) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="ph ph-graduation-cap"></i>
+                    <span>Jets Fees</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="#" class="active"><i class="ph ph-squares-four"></i> Dashboard</a></li>
+                    <li><a href="#"><i class="ph ph-student"></i> Students</a></li>
+                    <li><a href="#"><i class="ph ph-money"></i> Payments</a></li>
+                    <li><a href="#"><i class="ph ph-scroll"></i> Reports</a></li>
+                    
+                    <li class="nav-divider"></li>
+                    
+                    <li><a href="#"><i class="ph ph-gear"></i> Settings</a></li>
+                    {% if user.is_authenticated %}
+                        <li><a href="#"><i class="ph ph-sign-out"></i> Logout</a></li>
+                    {% else %}
+                         <li><a href="#"><i class="ph ph-sign-in"></i> Login</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    {% if user.is_authenticated %}
+                        <div class="avatar">{{ user.username|make_list|first|upper }}</div>
+                        <div class="details">
+                            <span class="name">{{ user.username }}</span>
+                            <span class="role">{{ user.get_role_display }}</span>
+                        </div>
+                    {% else %}
+                        <div class="details">
+                            <span class="name">Guest</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="top-bar">
+                <h1 class="page-title">{% block page_title %}Overview{% endblock %}</h1>
+                <!-- We can add notifications or profile actions here -->
+            </header>
+
+            <div class="content-wrapper">
+                {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                            <div class="alert {{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% block content %}
+                    <!-- Content goes here -->
+                {% endblock %}
+            </div>
+        </main>
+    </div>
+</body>
+</html>

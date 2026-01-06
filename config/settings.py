@@ -124,6 +124,11 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# Login Redirects
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'login'
+
 # Information on where to look for static files in development
 STATICFILES_DIRS = [
     BASE_DIR / 'static',

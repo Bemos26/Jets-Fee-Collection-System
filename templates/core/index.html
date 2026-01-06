@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Jets Fees{% endblock %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    /* Temporary inline styles for the dashboard widgets */
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.2s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .stat-card .label {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-card .value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .stat-card .icon-wrap {
+        width: 48px;
+        height: 48px;
+        background: var(--primary-light);
+        color: var(--primary-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .welcome-banner {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: white;
+        padding: 2rem;
+        border-radius: var(--radius-lg);
+        margin-bottom: 2rem;
+    }
+
+    .welcome-banner h2 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .welcome-banner p {
+        opacity: 0.9;
+    }
+</style>
+
+<div class="welcome-banner">
+    <h2>Welcome to Jets Fees Collection System</h2>
+    <p>Manage your school's finances efficiently and transparently.</p>
+</div>
+
+<!-- Placeholder Stats -->
+<div class="dashboard-grid">
+    <div class="stat-card">
+        <div class="icon-wrap"><i class="ph ph-users"></i></div>
+        <span class="label">Total Students</span>
+        <span class="value">0</span>
+    </div>
+
+    <div class="stat-card">
+        <div class="icon-wrap"><i class="ph ph-currency-dollar"></i></div>
+        <span class="label">Collected This Term</span>
+        <span class="value">$0.00</span>
+    </div>
+
+    <div class="stat-card">
+        <div class="icon-wrap"><i class="ph ph-trend-up"></i></div>
+        <span class="label">Expected Revenue</span>
+        <span class="value">$0.00</span>
+    </div>
+</div>
+{% endblock %}
