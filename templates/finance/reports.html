@@ -14,7 +14,7 @@
         </div>
         <div>
             <div style="font-size: 0.9rem; color: var(--text-muted);">Collected Today</div>
-            <div style="font-size: 2rem; font-weight: 700; color: var(--text-main);">${{ today_payments }}</div>
+            <div style="font-size: 2rem; font-weight: 700; color: var(--text-main);">KES {{ today_payments }}</div>
         </div>
     </div>
 
@@ -27,7 +27,7 @@
         </div>
         <div>
             <div style="font-size: 0.9rem; color: var(--text-muted);">Total Arrears (Debt)</div>
-            <div style="font-size: 2rem; font-weight: 700; color: var(--text-main);">${{ total_arrears }}</div>
+            <div style="font-size: 2rem; font-weight: 700; color: var(--text-main);">KES {{ total_arrears }}</div>
         </div>
     </div>
 </div>
@@ -65,6 +65,46 @@
             <tr>
                 <td colspan="4" style="padding: 2rem; text-align: center; color: var(--text-muted);">
                     No defaulters found! Great job.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card"
+    style="background: white; padding: 1.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); margin-top: 2rem;">
+    <h3
+        style="font-size: 1.1rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">
+        <i class="ph ph-piggy-bank" style="margin-right: 0.5rem;"></i> Students in Credit (Overpaid)
+    </h3>
+
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="text-align: left; color: var(--text-muted);">
+                <th style="padding: 0.75rem;">Student</th>
+                <th style="padding: 0.75rem;">Class</th>
+                <th style="padding: 0.75rem; text-align: right;">Credit Amount</th>
+                <th style="padding: 0.75rem; text-align: right;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in creditors %}
+            <tr style="border-bottom: 1px solid var(--border-color);">
+                <td style="padding: 0.75rem; font-weight: 500;">{{ student.full_name }}</td>
+                <td style="padding: 0.75rem;">{{ student.current_class.name }}</td>
+                <td style="padding: 0.75rem; text-align: right; color: var(--success); font-weight: 600;">
+                    ${{ student.current_balance|stringformat:"+f"|slice:"1:" }} <!-- Remove negative sign -->
+                </td>
+                <td style="padding: 0.75rem; text-align: right;">
+                    <a href="{% url 'student_detail' student.id %}"
+                        style="font-size: 0.8rem; color: var(--primary-color);">View Profile</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                    No students with credit balance.
                 </td>
             </tr>
             {% endfor %}

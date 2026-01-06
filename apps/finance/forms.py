@@ -1,13 +1,39 @@
 from django import forms
 from .models import FeeStructure
 
+from apps.core.models import StudentClass
+
 class FeeStructureForm(forms.ModelForm):
+    """
+    Standard form for editing a single fee structure (One class).
+    """
     class Meta:
         model = FeeStructure
         fields = ['term', 'student_class', 'amount', 'description', 'due_date']
         widgets = {
             'term': forms.Select(attrs={'class': 'form-input'}),
             'student_class': forms.Select(attrs={'class': 'form-input'}),
+            'amount': forms.NumberInput(attrs={'class': 'form-input', 'placeholder': 'e.g. 5000'}),
+            'description': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'e.g. Tuition Fee'}),
+            'due_date': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
+        }
+
+class FeeStructureCreateForm(forms.ModelForm):
+    """
+    Form for creating new fees, allowing selection of MULTIPLE classes.
+    """
+    student_classes = forms.ModelMultipleChoiceField(
+        queryset=StudentClass.objects.all(),
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-checkbox-list'}),
+        required=True,
+        label="Select Classes"
+    )
+
+    class Meta:
+        model = FeeStructure
+        fields = ['term', 'amount', 'description', 'due_date'] # Exclude student_class
+        widgets = {
+            'term': forms.Select(attrs={'class': 'form-input'}),
             'amount': forms.NumberInput(attrs={'class': 'form-input', 'placeholder': 'e.g. 5000'}),
             'description': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'e.g. Tuition Fee'}),
             'due_date': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),

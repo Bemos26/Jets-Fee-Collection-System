@@ -11,9 +11,9 @@
         <div style="text-align: center; margin-bottom: 2rem;">
             <div style="font-size: 0.9rem; color: var(--text-muted);">Recording payment for</div>
             <h2 style="font-size: 1.5rem; color: var(--text-main);">{{ student.full_name }}</h2>
-            <div
-                style="font-size: 0.9rem; margin-top: 0.5rem; background: {% if student.current_balance > 0 %}var(--danger){% else %}var(--success){% endif %}; color: white; display: inline-block; padding: 0.25rem 0.75rem; border-radius: 1rem;">
-                Current Balance: ${{ student.current_balance }}
+            <div class="{% if student.current_balance > 0 %}badge-danger{% else %}badge-success{% endif %}"
+                style="font-size: 0.9rem; margin-top: 0.5rem; color: white; display: inline-block; padding: 0.25rem 0.75rem; border-radius: 1rem;">
+                Current Balance: KES {{ student.current_balance }}
             </div>
         </div>
 
@@ -26,7 +26,7 @@
 
             <div class="form-group" style="margin-bottom: 1rem;">
                 <label class="form-label" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Amount
-                    ($)</label>
+                    (KES)</label>
                 {{ form.amount }}
                 {{ form.amount.errors }}
             </div>

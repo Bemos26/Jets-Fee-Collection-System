@@ -36,6 +36,7 @@ class Transaction(models.Model):
     date = models.DateTimeField(default=timezone.now)
     description = models.CharField(max_length=255)
     reference_number = models.CharField(max_length=50, unique=True, null=True, blank=True, help_text="e.g. Receipt No or Invoice No")
+    is_viewed = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

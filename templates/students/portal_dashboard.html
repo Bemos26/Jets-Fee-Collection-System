@@ -42,9 +42,9 @@
                             <div style="font-size: 0.8rem; color: var(--text-muted);">{{ transaction.reference_number }}
                             </div>
                         </td>
-                        <td
-                            style="padding: 1rem 0; text-align: right; font-weight: 600; color: {% if transaction.transaction_type == 'INVOICE' %}var(--danger){% else %}var(--success){% endif %};">
-                            {% if transaction.transaction_type == 'INVOICE' %}-{% else %}+{% endif %}$
+                        <td class="{% if transaction.transaction_type == 'INVOICE' %}text-danger{% else %}text-success{% endif %}"
+                            style="padding: 1rem 0; text-align: right; font-weight: 600;">
+                            {% if transaction.transaction_type == 'INVOICE' %}-{% else %}+{% endif %}KES
                             {{ transaction.amount }}
                         </td>
                     </tr>
@@ -64,9 +64,9 @@
         <div class="card"
             style="background: white; padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); text-align: center;">
             <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">Current Balance</div>
-            <div
-                style="font-size: 2.5rem; font-weight: 700; color: {% if student.current_balance > 0 %}var(--danger){% else %}var(--success){% endif %}; margin-bottom: 1.5rem;">
-                ${{ student.current_balance }}
+            <div class="{% if student.current_balance > 0 %}text-danger{% else %}text-success{% endif %}"
+                style="font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem;">
+                KES {{ student.current_balance }}
             </div>
 
             {% if student.current_balance > 0 %}

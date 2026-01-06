@@ -3,7 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from .models import FeeStructure, Transaction
-from .forms import FeeStructureForm, PaymentForm
+from .models import FeeStructure, Transaction
+from .forms import FeeStructureForm, FeeStructureCreateForm, PaymentForm
 
 from django.db import transaction, models
 from .models import FeeStructure, Transaction
@@ -20,16 +21,19 @@ def fee_structure_list(request):
     for fee in fees:
         total_students = Student.objects.filter(current_class=fee.student_class).count()
         # Count transactions for this specific fee using the unique ID suffix pattern
-        invoiced_count = Transaction.objects.filter(
+        invoices = Transaction.objects.filter(
             transaction_type=Transaction.TransactionType.INVOICE,
             reference_number__endswith=f"-{fee.id}"
-        ).count()
+        )
+        invoiced_count = invoices.count()
+        viewed_count = invoices.filter(is_viewed=True).count()
         
         fees_data.append({
             'fee': fee,
             'total_students': total_students,
             'invoiced_count': invoiced_count,
-            'pending_count': total_students - invoiced_count
+            'pending_count': total_students - invoiced_count,
+            'viewed_count': viewed_count
         })
         
     return render(request, 'finance/fee_structure_list.html', {'fees_data': fees_data})
@@ -37,18 +41,53 @@ def fee_structure_list(request):
 @login_required
 def fee_structure_create(request):
     """
-    Adds a new fee definition.
+    Adds a new fee definition (supports Multi-Class selection).
     """
     if request.method == 'POST':
-        form = FeeStructureForm(request.POST)
+        form = FeeStructureCreateForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Fee Structure added successfully!')
+            # Extract common data
+            student_classes = form.cleaned_data['student_classes']
+            term = form.cleaned_data['term']
+            amount = form.cleaned_data['amount']
+            description = form.cleaned_data['description']
+            due_date = form.cleaned_data['due_date']
+            
+            # Create a FeeStructure for EACH selected class
+            count = 0
+            for s_class in student_classes:
+                FeeStructure.objects.create(
+                    term=term,
+                    student_class=s_class,
+                    amount=amount,
+                    description=description,
+                    due_date=due_date
+                )
+                count += 1
+                
+            messages.success(request, f"Fee Structure created via bulk action for {count} classes!")
             return redirect('fee_structure_list')
     else:
-        form = FeeStructureForm()
+        form = FeeStructureCreateForm()
     
     return render(request, 'finance/fee_structure_form.html', {'form': form, 'title': 'Add Fee Structure'})
+
+@login_required
+def fee_structure_update(request, fee_id):
+    """
+    Edits an existing fee.
+    """
+    fee = get_object_or_404(FeeStructure, id=fee_id)
+    if request.method == 'POST':
+        form = FeeStructureForm(request.POST, instance=fee)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Fee Structure updated successfully!')
+            return redirect('fee_structure_list')
+    else:
+        form = FeeStructureForm(instance=fee)
+    
+    return render(request, 'finance/fee_structure_form.html', {'form': form, 'title': 'Edit Fee Structure'})
 
 @login_required
 def apply_fee_structure(request, fee_id):
@@ -65,11 +104,12 @@ def apply_fee_structure(request, fee_id):
         for student in students:
             # Check if this specific fee has already been billed to this student to avoid duplicates
             # A more robust system might allow re-billing, but let's prevent accidental double clicks.
+            # Check using the EXACT reference number logic we intend to create
+            # This ensures distinct FeeStructures are treated separately even if they share descriptions
+            expected_ref = f"INV-{fee.term.name}-{student.id}-{fee.id}"
+            
             exists = Transaction.objects.filter(
-                student=student,
-                transaction_type=Transaction.TransactionType.INVOICE,
-                description=fee.description,
-                reference_number__startswith=f"INV-{fee.term.name}-" # Simple deduplication check
+                reference_number=expected_ref
             ).exists()
             
             if not exists:
@@ -78,8 +118,7 @@ def apply_fee_structure(request, fee_id):
                     transaction_type=Transaction.TransactionType.INVOICE,
                     amount=fee.amount,
                     description=fee.description,
-                    # Use fee.id to ensure uniqueness even if descriptions are similar
-                    reference_number=f"INV-{fee.term.name}-{student.id}-{fee.id}" 
+                    reference_number=expected_ref
                 )
                 count += 1
     
@@ -152,10 +191,56 @@ def reports_dashboard(request):
     # 3. Defaulters List
     defaulters = Student.objects.filter(current_balance__gt=0).order_by('-current_balance')[:20] # Top 20 defaulters
     
+    # 4. Creditors (Students with excess payment/prepayment)
+    creditors = Student.objects.filter(current_balance__lt=0).order_by('current_balance')[:20]
+
     context = {
         'today_payments': today_payments,
         'total_arrears': total_arrears,
         'defaulters': defaulters,
+        'creditors': creditors,
     }
     
     return render(request, 'finance/reports.html', context)
+
+@login_required
+def bulk_invoice(request):
+    """
+    Invoices multiple selected fees at once.
+    """
+    if request.method == 'POST':
+        fee_ids = request.POST.getlist('selected_fees')
+        if not fee_ids:
+            messages.warning(request, "No fees selected for invoicing.")
+            return redirect('fee_structure_list')
+        
+        total_invoiced = 0
+        fees_processed = 0
+        
+        with transaction.atomic():
+            for fee_id in fee_ids:
+                fee = get_object_or_404(FeeStructure, id=fee_id)
+                students = Student.objects.filter(current_class=fee.student_class)
+                
+                for student in students:
+                    expected_ref = f"INV-{fee.term.name}-{student.id}-{fee.id}"
+                    exists = Transaction.objects.filter(reference_number=expected_ref).exists()
+                    
+                    if not exists:
+                        Transaction.objects.create(
+                            student=student,
+                            transaction_type=Transaction.TransactionType.INVOICE,
+                            amount=fee.amount,
+                            description=fee.description,
+                            reference_number=expected_ref
+                        )
+                        total_invoiced += 1
+                
+                fees_processed += 1
+        
+        if total_invoiced > 0:
+            messages.success(request, f"Successfully processed {fees_processed} fees and invoiced {total_invoiced} students.")
+        else:
+            messages.info(request, "Processed selected fees, but no new invoices were needed (everyone is up to date).")
+            
+    return redirect('fee_structure_list')

@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from apps.users.models import User
+from apps.finance.models import Transaction
 from .models import Student
 from .forms import StudentForm
 
@@ -63,6 +64,15 @@ def portal_dashboard(request):
         return redirect('home') # Fallback
         
     student = request.user.student_profile
+    
+    # === MARK AS VIEWED LOGIC ===
+    # When student visits dashboard, mark all their 'INVOICE' transactions as viewed
+    Transaction.objects.filter(
+        student=student, 
+        transaction_type=Transaction.TransactionType.INVOICE, 
+        is_viewed=False
+    ).update(is_viewed=True)
+    
     return render(request, 'students/portal_dashboard.html', {'student': student})
 
 @login_required
@@ -126,3 +136,27 @@ def student_update(request, student_id):
 def student_detail(request, student_id):
     student = get_object_or_404(Student, id=student_id)
     return render(request, 'students/student_detail.html', {'student': student})
+
+@login_required
+@user_passes_test(is_admin)
+def student_delete(request, student_id):
+    """
+    Deletes a student and their linked portal account.
+    """
+    student = get_object_or_404(Student, id=student_id)
+    
+    if request.method == 'POST':
+        # Name for message
+        name = student.full_name
+        
+        # Delete linked user if exists
+        if student.user:
+            student.user.delete()
+            
+        # Delete student record
+        student.delete()
+        
+        messages.success(request, f"Student '{name}' and their portal account have been permanently deleted.")
+        return redirect('student_list')
+        
+    return render(request, 'students/student_confirm_delete.html', {'student': student})

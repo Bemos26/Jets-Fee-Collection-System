@@ -14,7 +14,7 @@
                 style="width: 80px; height: 80px; background: var(--primary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 600;">
                 {{ student.first_name|make_list|first }}{{ student.last_name|make_list|first }}
             </div>
-            <div>
+            <div style="flex: 1;">
                 <h2 style="font-size: 1.5rem; margin-bottom: 0.25rem;">{{ student.full_name }}</h2>
                 <div style="color: var(--text-muted);">Admission No: <span
                         style="font-weight: 600; color: var(--text-main);">{{ student.admission_number }}</span></div>
@@ -24,6 +24,12 @@
                         {{ student.current_class.name|default:"No Class Assigned" }}
                     </span>
                 </div>
+            </div>
+            <div>
+                <a href="{% url 'student_delete' student.id %}"
+                    style="background: #fff5f5; color: var(--danger); padding: 0.5rem 1rem; border-radius: var(--radius-md); font-weight: 500; text-decoration: none; border: 1px solid #fed7d7;">
+                    <i class="ph ph-trash"></i> Delete
+                </a>
             </div>
         </div>
 
@@ -88,9 +94,9 @@
             <div style="margin-bottom: 1.5rem;">
                 <div style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.25rem;">Current Balance
                 </div>
-                <div
-                    style="font-size: 2rem; font-weight: 700; color: {% if student.current_balance > 0 %}var(--danger){% else %}var(--success){% endif %};">
-                    ${{ student.current_balance }}
+                <div class="{% if student.current_balance > 0 %}text-danger{% else %}text-success{% endif %}"
+                    style="font-size: 2rem; font-weight: 700;">
+                    KES {{ student.current_balance }}
                 </div>
             </div>
 
@@ -125,9 +131,9 @@
                             <div style="font-size: 0.75rem; color: var(--text-muted);">
                                 {{ transaction.reference_number }}</div>
                         </td>
-                        <td
-                            style="padding: 0.75rem 0; text-align: right; font-weight: 600; color: {% if transaction.transaction_type == 'INVOICE' %}var(--danger){% else %}var(--success){% endif %};">
-                            {% if transaction.transaction_type == 'INVOICE' %}-{% else %}+{% endif %}$
+                        <td class="{% if transaction.transaction_type == 'INVOICE' %}text-danger{% else %}text-success{% endif %}"
+                            style="padding: 0.75rem 0; text-align: right; font-weight: 600;">
+                            {% if transaction.transaction_type == 'INVOICE' %}-{% else %}+{% endif %}KES
                             {{ transaction.amount }}
                         </td>
                         <td style="padding: 0.75rem 0; text-align: right;">
