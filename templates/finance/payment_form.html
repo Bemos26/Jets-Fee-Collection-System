@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Record Payment - {{ student.full_name }}{% endblock %}
+{% block page_title %}Record Payment{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 0 auto;">
+    <div class="card"
+        style="background: white; padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <div style="font-size: 0.9rem; color: var(--text-muted);">Recording payment for</div>
+            <h2 style="font-size: 1.5rem; color: var(--text-main);">{{ student.full_name }}</h2>
+            <div
+                style="font-size: 0.9rem; margin-top: 0.5rem; background: {% if student.current_balance > 0 %}var(--danger){% else %}var(--success){% endif %}; color: white; display: inline-block; padding: 0.25rem 0.75rem; border-radius: 1rem;">
+                Current Balance: ${{ student.current_balance }}
+            </div>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert error">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label class="form-label" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Amount
+                    ($)</label>
+                {{ form.amount }}
+                {{ form.amount.errors }}
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label class="form-label"
+                    style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Description</label>
+                {{ form.description }}
+                {{ form.description.errors }}
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label class="form-label" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Reference /
+                    Receipt No.</label>
+                {{ form.reference }}
+                {{ form.reference.errors }}
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button type="submit" class="btn-primary"
+                    style="background-color: var(--success); color: white; padding: 0.875rem 2rem; border: none; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; flex: 1;">Complete
+                    Payment</button>
+                <a href="{% url 'student_detail' student.id %}"
+                    style="padding: 0.875rem 2rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-weight: 600; text-align: center;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

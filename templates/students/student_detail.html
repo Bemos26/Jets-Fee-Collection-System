@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ student.full_name }} - Profile{% endblock %}
+{% block page_title %}Student Profile{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+
+    <!-- Left Column: Personal Info -->
+    <div class="card"
+        style="background: white; padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+        <div style="display: flex; gap: 1.5rem; align-items: flex-start; margin-bottom: 2rem;">
+            <div
+                style="width: 80px; height: 80px; background: var(--primary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 600;">
+                {{ student.first_name|make_list|first }}{{ student.last_name|make_list|first }}
+            </div>
+            <div>
+                <h2 style="font-size: 1.5rem; margin-bottom: 0.25rem;">{{ student.full_name }}</h2>
+                <div style="color: var(--text-muted);">Admission No: <span
+                        style="font-weight: 600; color: var(--text-main);">{{ student.admission_number }}</span></div>
+                <div style="margin-top: 0.5rem;">
+                    <span
+                        style="background: var(--primary-light); color: var(--primary-color); padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.875rem; font-weight: 500;">
+                        {{ student.current_class.name|default:"No Class Assigned" }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <h3
+            style="font-size: 1.1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1rem;">
+            Personal Details</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+            <div>
+                <div style="font-size: 0.875rem; color: var(--text-muted);">Date of Birth</div>
+                <div style="font-weight: 500;">{{ student.date_of_birth|default:"-" }}</div>
+            </div>
+            <!-- Add more fields here -->
+        </div>
+
+        <h3
+            style="font-size: 1.1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1rem;">
+            Parent / Guardian</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+                <div style="font-size: 0.875rem; color: var(--text-muted);">Phone</div>
+                <div style="font-weight: 500;">{{ student.parent_phone }}</div>
+            </div>
+            <div>
+                <div style="font-size: 0.875rem; color: var(--text-muted);">Email</div>
+                <div style="font-weight: 500;">{{ student.parent_email|default:"-" }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Financial Overview & Transactions -->
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+
+        <!-- Balance Card -->
+        <div class="card"
+            style="background: white; padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+            <h3 style="font-size: 1.1rem; margin-bottom: 1.5rem;">Financial Overview</h3>
+
+            <div style="margin-bottom: 1.5rem;">
+                <div style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.25rem;">Current Balance
+                </div>
+                <div
+                    style="font-size: 2rem; font-weight: 700; color: {% if student.current_balance > 0 %}var(--danger){% else %}var(--success){% endif %};">
+                    ${{ student.current_balance }}
+                </div>
+            </div>
+
+            <a href="{% url 'record_payment' student.id %}" class="btn-primary"
+                style="display: block; text-align: center; width: 100%; padding: 0.875rem; background: var(--primary-color); color: white; border: none; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; text-decoration: none;">
+                Record Payment
+            </a>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="card"
+            style="background: white; padding: 1.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); flex: 1;">
+            <h3
+                style="font-size: 1.1rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+                Transaction History</h3>
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                <thead>
+                    <tr style="text-align: left; color: var(--text-muted);">
+                        <th style="padding: 0.5rem 0;">Date</th>
+                        <th style="padding: 0.5rem 0;">Description</th>
+                        <th style="padding: 0.5rem 0; text-align: right;">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in student.transactions.all|slice:":5" %}
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td style="padding: 0.75rem 0;">{{ transaction.date|date:"M d, Y" }}</td>
+                        <td style="padding: 0.75rem 0;">
+                            <div>{{ transaction.description }}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">{{ transaction.reference_number
+                                }}</div>
+                        </td>
+                        <td
+                            style="padding: 0.75rem 0; text-align: right; font-weight: 600; color: {% if transaction.transaction_type == 'INVOICE' %}var(--danger){% else %}var(--success){% endif %};">
+                            {% if transaction.transaction_type == 'INVOICE' %}-{% else %}+{% endif %}${{
+                            transaction.amount }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="padding: 1rem; text-align: center; color: var(--text-muted);">No
+                            transactions yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if student.transactions.count > 5 %}
+            <div style="margin-top: 1rem; text-align: center;">
+                <a href="#" style="color: var(--primary-color); font-weight: 500; font-size: 0.9rem;">View All
+                    Transactions</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

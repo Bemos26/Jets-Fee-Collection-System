@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +12,7 @@
     <!-- Icons (Phosphor Icons - clean and modern) -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
+
 <body>
     <div class="app-container">
         <!-- Sidebar Navigation -->
@@ -21,37 +23,49 @@
                     <span>Jets Fees</span>
                 </div>
             </div>
-            
+
             <nav class="sidebar-nav">
                 <ul>
-                    <li><a href="#" class="active"><i class="ph ph-squares-four"></i> Dashboard</a></li>
-                    <li><a href="#"><i class="ph ph-student"></i> Students</a></li>
-                    <li><a href="#"><i class="ph ph-money"></i> Payments</a></li>
+                    <li><a href="{% url 'home' %}"
+                            class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                            <i class="ph ph-squares-four"></i> Dashboard
+                        </a></li>
+
+                    <li><a href="{% url 'student_list' %}" class="{% if 'students' in request.path %}active{% endif %}">
+                            <i class="ph ph-student"></i> Students
+                        </a></li>
+
+                    <li><a href="{% url 'fee_structure_list' %}"
+                            class="{% if 'fees' in request.path %}active{% endif %}">
+                            <i class="ph ph-money"></i> Fees & Finance
+                        </a></li>
+
                     <li><a href="#"><i class="ph ph-scroll"></i> Reports</a></li>
-                    
+
                     <li class="nav-divider"></li>
-                    
+
                     <li><a href="#"><i class="ph ph-gear"></i> Settings</a></li>
+
                     {% if user.is_authenticated %}
-                        <li><a href="#"><i class="ph ph-sign-out"></i> Logout</a></li>
+                    <li><a href="{% url 'logout' %}"><i class="ph ph-sign-out"></i> Logout</a></li>
                     {% else %}
-                         <li><a href="#"><i class="ph ph-sign-in"></i> Login</a></li>
+                    <li><a href="{% url 'login' %}"><i class="ph ph-sign-in"></i> Login</a></li>
                     {% endif %}
                 </ul>
             </nav>
-            
+
             <div class="sidebar-footer">
                 <div class="user-info">
                     {% if user.is_authenticated %}
-                        <div class="avatar">{{ user.username|make_list|first|upper }}</div>
-                        <div class="details">
-                            <span class="name">{{ user.username }}</span>
-                            <span class="role">{{ user.get_role_display }}</span>
-                        </div>
+                    <div class="avatar">{{ user.username|make_list|first|upper }}</div>
+                    <div class="details">
+                        <span class="name">{{ user.username }}</span>
+                        <span class="role">{{ user.get_role_display }}</span>
+                    </div>
                     {% else %}
-                        <div class="details">
-                            <span class="name">Guest</span>
-                        </div>
+                    <div class="details">
+                        <span class="name">Guest</span>
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -66,20 +80,21 @@
 
             <div class="content-wrapper">
                 {% if messages %}
-                    <div class="messages">
-                        {% for message in messages %}
-                            <div class="alert {{ message.tags }}">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
+                <div class="messages">
+                    {% for message in messages %}
+                    <div class="alert {{ message.tags }}">
+                        {{ message }}
                     </div>
+                    {% endfor %}
+                </div>
                 {% endif %}
 
                 {% block content %}
-                    <!-- Content goes here -->
+                <!-- Content goes here -->
                 {% endblock %}
             </div>
         </main>
     </div>
 </body>
+
 </html>

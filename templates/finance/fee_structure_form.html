@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Fee Structure - Jets Fees{% endblock %}
+{% block page_title %}Define New Fee{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <div class="card"
+        style="background: white; padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert error">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label class="form-label" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Academic
+                        Term</label>
+                    {{ form.term }}
+                    {{ form.term.errors }}
+                </div>
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label class="form-label"
+                        style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Class</label>
+                    {{ form.student_class }}
+                    {{ form.student_class.errors }}
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label class="form-label"
+                    style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Description</label>
+                {{ form.description }}
+                {{ form.description.errors }}
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label class="form-label" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Amount
+                        ($)</label>
+                    {{ form.amount }}
+                    {{ form.amount.errors }}
+                </div>
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label class="form-label" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Due
+                        Date</label>
+                    {{ form.due_date }}
+                    {{ form.due_date.errors }}
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button type="submit" class="btn-primary"
+                    style="background-color: var(--primary-color); color: white; padding: 0.875rem 2rem; border: none; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; flex: 1;">Save
+                    Fee Structure</button>
+                <a href="{% url 'fee_structure_list' %}"
+                    style="padding: 0.875rem 2rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-weight: 600; text-align: center;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

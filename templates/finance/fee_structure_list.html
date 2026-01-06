@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Fee Structures - Jets Fees{% endblock %}
+{% block page_title %}Fee Structures{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+    <a href="{% url 'fee_structure_create' %}" class="btn-primary"
+        style="background-color: var(--primary-color); color: white; padding: 0.75rem 1.5rem; border-radius: var(--radius-md); font-weight: 600;">
+        <i class="ph ph-plus"></i> Add New Fee
+    </a>
+</div>
+
+<div class="card"
+    style="background: white; padding: 1.5rem; border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 2px solid var(--border-color);">
+                <th style="padding: 1rem; text-align: left; color: var(--text-muted);">Term</th>
+                <th style="padding: 1rem; text-align: left; color: var(--text-muted);">Class</th>
+                <th style="padding: 1rem; text-align: left; color: var(--text-muted);">Description</th>
+                <th style="padding: 1rem; text-align: right; color: var(--text-muted);">Amount</th>
+                <th style="padding: 1rem; text-align: left; color: var(--text-muted); padding-left: 2rem;">Due Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for fee in fees %}
+            <tr style="border-bottom: 1px solid var(--border-color);">
+                <td style="padding: 1rem; font-weight: 500;">{{ fee.term.name }}</td>
+                <td style="padding: 1rem;">
+                    <span
+                        style="background: var(--bg-body); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.875rem;">{{
+                        fee.student_class.name }}</span>
+                </td>
+                <td style="padding: 1rem;">{{ fee.description }}</td>
+                <td style="padding: 1rem; text-align: right; font-weight: 600;">${{ fee.amount }}</td>
+                <td style="padding: 1rem; padding-left: 2rem;">{{ fee.due_date|default:"-" }}</td>
+                <td style="padding: 1rem;">
+                    <a href="{% url 'apply_fee_structure' fee.id %}"
+                        onclick="return confirm('Are you sure you want to invoice ALL students in {{ fee.student_class.name }} for this fee?');"
+                        style="background: var(--primary-light); color: var(--primary-color); padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: 600; font-size: 0.8rem;">
+                        Apply to Class
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                    No fees defined yet. Click "Add New Fee" to start.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

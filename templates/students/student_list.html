@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Students - Jets Fees{% endblock %}
+{% block page_title %}Students{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+    <a href="{% url 'student_create' %}" class="btn-primary"
+        style="background-color: var(--primary-color); color: white; padding: 0.75rem 1.5rem; border-radius: var(--radius-md); font-weight: 600;">
+        <i class="ph ph-plus"></i> Register Student
+    </a>
+</div>
+
+<div class="card"
+    style="background: white; padding: 1.5rem; border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 2px solid var(--border-color);">
+                <th style="padding: 1rem; text-align: left; color: var(--text-muted);">Name</th>
+                <th style="padding: 1rem; text-align: left; color: var(--text-muted);">Admission No.</th>
+                <th style="padding: 1rem; text-align: left; color: var(--text-muted);">Class</th>
+                <th style="padding: 1rem; text-align: left; color: var(--text-muted);">Parent Contact</th>
+                <th style="padding: 1rem; text-align: right; color: var(--text-muted);">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr style="border-bottom: 1px solid var(--border-color);">
+                <td style="padding: 1rem; font-weight: 500;">
+                    <div style="display: flex; items-center; gap: 0.5rem;">
+                        <span
+                            style="width: 32px; height: 32px; background: var(--primary-light); color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">
+                            {{ student.first_name|make_list|first }}{{ student.last_name|make_list|first }}
+                        </span>
+                        {{ student.full_name }}
+                    </div>
+                </td>
+                <td style="padding: 1rem;">{{ student.admission_number }}</td>
+                <td style="padding: 1rem;">
+                    {% if student.current_class %}
+                    <span
+                        style="background: var(--bg-body); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.875rem;">{{
+                        student.current_class.name }}</span>
+                    {% else %}
+                    <span style="color: var(--text-muted);">-</span>
+                    {% endif %}
+                </td>
+                <td style="padding: 1rem;">
+                    <div>{{ student.parent_phone }}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">{{ student.parent_email|default:"" }}
+                    </div>
+                </td>
+                <td style="padding: 1rem; text-align: right;">
+                    <!-- Placeholder for Edit/View buttons -->
+                    <a href="#" style="color: var(--primary-color);"><i class="ph ph-pencil-simple"></i></a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                    No students found. Click "Register Student" to add one.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
