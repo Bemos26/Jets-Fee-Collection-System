@@ -28,6 +28,8 @@ def home(request):
     # === DISPATCHER LOGIC ===
     if request.user.role == 'STUDENT':
         return redirect('student_portal')
+    elif request.user.role == 'BURSAR':
+        return redirect('bursar_dashboard')
     
     context = {
         'total_students': total_students,

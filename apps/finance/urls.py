@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from . import views, views_bursar
 
 urlpatterns = [
     # Fee Structure URLs
@@ -13,4 +13,7 @@ urlpatterns = [
     path('reports/', views.reports_dashboard, name='reports'),
     path('reports/defaulters/', views.defaulters_list, name='defaulters_list'),
     path('reports/daily-collection/', views.daily_collection, name='daily_collection'),
+    
+    # Bursar
+    path('dashboard/bursar/', views_bursar.bursar_dashboard, name='bursar_dashboard'),
 ]

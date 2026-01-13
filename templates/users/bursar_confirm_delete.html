@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Remove Staff - Jets Fees{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 2rem auto; text-align: center;">
+    <div class="card"
+        style="background: white; padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+        <div
+            style="width: 60px; height: 60px; background: var(--danger-light); color: var(--danger); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 1.5rem;">
+            <i class="ph ph-warning"></i>
+        </div>
+
+        <h2 style="margin-bottom: 1rem; color: var(--danger);">Remove Access?</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+            Are you sure you want to remove <strong>{{ user_obj.get_full_name|default:user_obj.username }}</strong>?
+        </p>
+
+        <p
+            style="text-align: left; background: var(--bg-body); padding: 1rem; border-radius: 8px; font-size: 0.9rem; color: var(--text-main); margin-bottom: 2rem;">
+            This will permanently delete their account. They will no longer be able to log in to the system. Financial
+            records created by them will remain.
+        </p>
+
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <form method="post" style="flex: 1;">
+                {% csrf_token %}
+                <button type="submit"
+                    style="width: 100%; padding: 0.875rem 1.5rem; background: var(--danger); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
+                    Yes, Remove Access
+                </button>
+            </form>
+            <a href="{% url 'bursar_list' %}"
+                style="flex: 1; display:flex; align-items:center; justify-content:center; padding: 0.875rem 1.5rem; border: 1px solid var(--border-color); border-radius: 6px; text-decoration: none; color: var(--text-color); font-weight: 600;">
+                Cancel
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

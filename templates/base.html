@@ -61,6 +61,12 @@
 
                     <li class="nav-divider"></li>
 
+                    {% if user.role == 'ADMIN' %}
+                    <li><a href="{% url 'bursar_list' %}" class="{% if 'bursars' in request.path %}active{% endif %}">
+                            <i class="ph ph-users-three"></i> Manage Staff
+                        </a></li>
+                    {% endif %}
+
                     <li><a href="{% url 'settings' %}" class="{% if 'settings' in request.path %}active{% endif %}">
                             <i class="ph ph-gear"></i> Settings
                         </a></li>

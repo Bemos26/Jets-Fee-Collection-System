@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Bursar Dashboard - Jets Fees{% endblock %}
+{% block page_title %}Bursar Dashboard{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
+
+    <!-- Left Column: Quick Stats & Actions -->
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+
+        <!-- Today's Collection Card -->
+        <div class="card"
+            style="background: white; padding: 1.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); border-left: 5px solid var(--success);">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                <div
+                    style="width: 40px; height: 40px; background: var(--success-light); color: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="ph ph-hand-coins"></i>
+                </div>
+                <div style="font-weight: 600; color: var(--text-muted); font-size: 0.9rem;">Collected Today</div>
+            </div>
+            <div style="font-size: 2rem; font-weight: 700; color: var(--text-main);">KES {{ today_payments }}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">{{ today|date:"l, d M Y" }}
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card"
+            style="background: white; padding: 1.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
+            <h3 style="font-size: 1rem; margin-bottom: 1rem; color: var(--text-main);">Quick Actions</h3>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <a href="{% url 'student_list' %}"
+                    style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: var(--bg-body); border-radius: 8px; text-decoration: none; color: var(--text-main); font-weight: 500; transition: background 0.2s;">
+                    <i class="ph ph-magnifying-glass" style="color: var(--primary-color);"></i> Find Student & Pay
+                </a>
+                <a href="{% url 'daily_collection' %}"
+                    style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: var(--bg-body); border-radius: 8px; text-decoration: none; color: var(--text-main); font-weight: 500; transition: background 0.2s;">
+                    <i class="ph ph-receipt" style="color: var(--success);"></i> View Today's Report
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Recent Activity -->
+    <div class="card"
+        style="background: white; padding: 1.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
+        <h3
+            style="font-size: 1.1rem; margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+            <span><i class="ph ph-clock-counter-clockwise"></i> Recent Payments</span>
+        </h3>
+
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr
+                    style="text-align: left; color: var(--text-muted); font-size: 0.85rem; border-bottom: 1px solid var(--border-color);">
+                    <th style="padding: 0.75rem;">Time</th>
+                    <th style="padding: 0.75rem;">Student</th>
+                    <th style="padding: 0.75rem; text-align: right;">Amount</th>
+                    <th style="padding: 0.75rem; text-align: right;">Receipt</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tx in recent_transactions %}
+                <tr style="border-bottom: 1px solid var(--border-color);">
+                    <td style="padding: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">{{ tx.date|date:"H:i" }}
+                    </td>
+                    <td style="padding: 0.75rem; font-weight: 500;">
+                        {{ tx.student.full_name }}
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">{{ tx.reference_number }}</div>
+                    </td>
+                    <td style="padding: 0.75rem; text-align: right; font-weight: 600; color: var(--success);">+{{
+                        tx.amount }}</td>
+                    <td style="padding: 0.75rem; text-align: right;">
+                        <a href="{% url 'transaction_receipt' tx.id %}" target="_blank"
+                            style="color: var(--primary-color);"><i class="ph ph-printer"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="padding: 2rem; text-align: center; color: var(--text-muted);">No recent
+                        payments.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
