@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Classes - Jets Fees{% endblock %}
+{% block page_title %}Manage Classes{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+    <a href="{% url 'class_create' %}" class="btn-primary"
+        style="background-color: var(--primary-color); color: white; padding: 0.75rem 1.5rem; border-radius: var(--radius-md); font-weight: 600;">
+        <i class="ph ph-plus"></i> Add New Class
+    </a>
+</div>
+
+<div class="card"
+    style="background: white; padding: 1.5rem; border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 2px solid var(--border-color);">
+                <th style="padding: 1rem; text-align: left; color: var(--text-muted);">Class Name</th>
+                <th style="padding: 1rem; text-align: right; color: var(--text-muted);">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for class in classes %}
+            <tr style="border-bottom: 1px solid var(--border-color);">
+                <td style="padding: 1rem; font-weight: 500;">{{ class.name }}</td>
+                <td style="padding: 1rem; text-align: right;">
+                    <a href="{% url 'class_update' class.pk %}"
+                        style="color: var(--primary-color); margin-right: 0.5rem;" title="Edit"><i
+                            class="ph ph-pencil-simple"></i></a>
+                    <a href="{% url 'class_delete' class.pk %}" style="color: var(--danger);" title="Delete"><i
+                            class="ph ph-trash"></i></a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2" style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                    No classes found. Add one to get started.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

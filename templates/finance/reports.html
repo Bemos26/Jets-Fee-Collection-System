@@ -53,8 +53,8 @@
             <tr style="border-bottom: 1px solid var(--border-color);">
                 <td style="padding: 0.75rem; font-weight: 500;">{{ student.full_name }}</td>
                 <td style="padding: 0.75rem;">{{ student.current_class.name }}</td>
-                <td style="padding: 0.75rem; text-align: right; color: var(--danger); font-weight: 600;">
-                    ${{ student.current_balance }}
+                <td class="text-danger" style="padding: 0.75rem; text-align: right; font-weight: 600;">
+                    KES {{ student.current_balance }}
                 </td>
                 <td style="padding: 0.75rem; text-align: right;">
                     <a href="{% url 'student_detail' student.id %}"
@@ -93,8 +93,8 @@
             <tr style="border-bottom: 1px solid var(--border-color);">
                 <td style="padding: 0.75rem; font-weight: 500;">{{ student.full_name }}</td>
                 <td style="padding: 0.75rem;">{{ student.current_class.name }}</td>
-                <td style="padding: 0.75rem; text-align: right; color: var(--success); font-weight: 600;">
-                    ${{ student.current_balance|stringformat:"+f"|slice:"1:" }} <!-- Remove negative sign -->
+                <td class="text-success" style="padding: 0.75rem; text-align: right; font-weight: 600;">
+                    KES {{ student.current_balance|stringformat:"+f"|slice:"1:" }} <!-- Remove negative sign -->
                 </td>
                 <td style="padding: 0.75rem; text-align: right;">
                     <a href="{% url 'student_detail' student.id %}"

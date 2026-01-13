@@ -46,6 +46,10 @@
                             <i class="ph ph-student"></i> Students
                         </a></li>
 
+                    <li><a href="{% url 'class_list' %}" class="{% if 'classes' in request.path %}active{% endif %}">
+                            <i class="ph ph-chalkboard"></i> Manage Classes
+                        </a></li>
+
                     <li><a href="{% url 'fee_structure_list' %}"
                             class="{% if 'fees' in request.path %}active{% endif %}">
                             <i class="ph ph-money"></i> Fees & Finance

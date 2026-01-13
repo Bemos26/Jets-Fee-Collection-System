@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - Jets Fees{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 0 auto;">
+    <div class="card"
+        style="background: white; padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert error">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label class="form-label" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Class
+                    Name</label>
+                {{ form.name }}
+                {{ form.name.errors }}
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button type="submit" class="btn-primary"
+                    style="background-color: var(--primary-color); color: white; padding: 0.875rem 2rem; border: none; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; flex: 1;">
+                    Save Class
+                </button>
+                <a href="{% url 'class_list' %}"
+                    style="padding: 0.875rem 2rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-weight: 600; text-align: center;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

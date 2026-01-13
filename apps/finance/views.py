@@ -157,7 +157,7 @@ def record_payment(request, student_id):
                 reference_number=reference or f"PAY-{timezone.now().timestamp()}"
             )
             
-            messages.success(request, f"Payment of ${amount} recorded for {student.full_name}")
+            messages.success(request, f"Payment of KES {amount} recorded for {student.full_name}")
             return redirect('student_detail', student_id=student.id)
     else:
         form = PaymentForm()

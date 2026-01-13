@@ -6,7 +6,7 @@ from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', core_views.home, name='home'),
+    path('', include('apps.core.urls')),
     
     # Auth URLs
     path('login/', user_views.CustomLoginView.as_view(), name='login'),
