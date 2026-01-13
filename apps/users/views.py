@@ -49,6 +49,12 @@ def bursar_create(request):
             user = form.save(commit=False)
             user.role = User.Role.BURSAR
             user.save()
+            
+            # Audit Log
+            from apps.audit.utils import log_action
+            from apps.audit.models import AuditLog
+            log_action(request, user, AuditLog.Action.CREATE, f"Created Bursar account: {user.username}")
+            
             messages.success(request, f"Bursar account for {user.username} created successfully.")
             return redirect('bursar_list')
     else:
@@ -65,6 +71,12 @@ def bursar_delete(request, user_id):
     
     if request.method == 'POST':
         username = user.username
+        
+        # Audit Log
+        from apps.audit.utils import log_action
+        from apps.audit.models import AuditLog
+        log_action(request, user, AuditLog.Action.DELETE, f"Removed Bursar account: {username}")
+        
         user.delete()
         messages.success(request, f"Bursar {username} has been removed.")
         return redirect('bursar_list')

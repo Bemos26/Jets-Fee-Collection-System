@@ -18,4 +18,5 @@ urlpatterns = [
     path('students/', include('apps.students.urls')),
     path('finance/', include('apps.finance.urls')),
     path('staff/', include('apps.users.urls')),
+    path('audit/', include('apps.audit.urls')),
 ]

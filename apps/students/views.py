@@ -135,6 +135,11 @@ def student_create(request):
                     messages.success(request, f"Student registered! Account created. User: {username}, Pass: {password}")
                 else:
                     messages.success(request, 'Student registered successfully!')
+
+                # Audit Log
+                from apps.audit.utils import log_action
+                from apps.audit.models import AuditLog
+                log_action(request, student, AuditLog.Action.CREATE, f"Registered new student: {student.full_name}")
                     
             except Exception as e:
                 messages.warning(request, f"Student registered, but account creation failed: {e}")
@@ -156,7 +161,13 @@ def student_update(request, student_id):
     if request.method == 'POST':
         form = StudentForm(request.POST, instance=student)
         if form.is_valid():
-            form.save()
+            student = form.save()
+            
+            # Audit Log
+            from apps.audit.utils import log_action
+            from apps.audit.models import AuditLog
+            log_action(request, student, AuditLog.Action.UPDATE, "Updated student profile details")
+            
             messages.success(request, 'Student details updated successfully!')
             return redirect('student_list')
     else:
@@ -205,9 +216,16 @@ def student_delete(request, student_id):
         name = student.full_name
         
         # Delete linked user if exists
+        # Delete linked user if exists
         if student.user:
             student.user.delete()
             
+        # Audit Log (Must be before delete to capture ID, although object will be gone)
+        # Ideally, we log the details string since the ID won't point to anything soon
+        from apps.audit.utils import log_action
+        from apps.audit.models import AuditLog
+        log_action(request, student, AuditLog.Action.DELETE, f"Deleted student: {name} (Adm: {student.admission_number})")
+
         # Delete student record
         student.delete()
         

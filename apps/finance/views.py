@@ -161,6 +161,11 @@ def record_payment(request, student_id):
                 reference_number=reference or f"PAY-{timezone.now().timestamp()}"
             )
             
+            # Audit Log
+            from apps.audit.utils import log_action
+            from apps.audit.models import AuditLog
+            log_action(request, student, AuditLog.Action.PAYMENT, f"Received {amount} from {student.role} via {description or 'Standard Payment'}")
+            
             messages.success(request, f"Payment of KES {amount} recorded for {student.full_name}")
             return redirect('student_detail', student_id=student.id)
     else:
