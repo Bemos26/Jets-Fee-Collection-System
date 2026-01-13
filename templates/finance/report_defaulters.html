@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Defaulters List - Jets Fees{% endblock %}
+{% block page_title %}Outstanding Balances Report{% endblock %}
+
+{% block content %}
+<div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+    <!-- Summary Card -->
+    <div class="card"
+        style="background: white; padding: 1.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); flex: 1; display: flex; align-items: center; gap: 1.5rem;">
+        <div
+            style="width: 50px; height: 50px; background: var(--danger-light); color: var(--danger); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+            <i class="ph ph-money"></i>
+        </div>
+        <div>
+            <div style="font-size: 0.9rem; color: var(--text-muted);">Total Outstanding Debt</div>
+            <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-main);">KES {{ total_debt }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="card"
+    style="background: white; padding: 1.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
+    <!-- Filter Form -->
+    <form method="get"
+        style="display: flex; gap: 1rem; align-items: flex-end; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color);">
+        <div style="flex: 1;">
+            <label
+                style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-color); font-size: 0.9rem;">Filter
+                by Class</label>
+            <select name="class_id" onchange="this.form.submit()"
+                style="width: 100%; border: 1px solid var(--border-color); padding: 0.5rem 1rem; border-radius: 4px;">
+                <option value="">All Classes</option>
+                {% for cls in classes %}
+                <option value="{{ cls.id }}" {% if cls.is_selected %}selected{% endif %}>{{ cls.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="flex: 1;">
+            <label
+                style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-color); font-size: 0.9rem;">Minimum
+                Debt (KES)</label>
+            <input type="number" name="min_amount" value="{{ min_amount|default:'' }}" placeholder="e.g. 1000"
+                style="width: 100%; border: 1px solid var(--border-color); padding: 0.5rem 1rem; border-radius: 4px;">
+        </div>
+        <button type="submit" class="btn-primary"
+            style="background-color: var(--primary-color); color: white; padding: 0.5rem 1.5rem; border: none; border-radius: 4px; font-weight: 600; cursor: pointer;">
+            Filter
+        </button>
+        <a href="{% url 'defaulters_list' %}"
+            style="padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-muted); text-decoration: none;">Clear</a>
+    </form>
+
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="text-align: left; color: var(--text-muted); border-bottom: 2px solid var(--border-color);">
+                <th style="padding: 1rem;">Student</th>
+                <th style="padding: 1rem;">Class</th>
+                <th style="padding: 1rem;">Parent Contact</th>
+                <th style="padding: 1rem; text-align: right;">Amount Owed</th>
+                <th style="padding: 1rem; text-align: right;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr style="border-bottom: 1px solid var(--border-color);">
+                <td style="padding: 1rem; font-weight: 500;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span
+                            style="width: 32px; height: 32px; background: var(--bg-body); color: var(--text-muted); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">
+                            {{ student.first_name|make_list|first }}{{ student.last_name|make_list|first }}
+                        </span>
+                        {{ student.full_name }}
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-left: 2.5rem;">{{
+                        student.admission_number }}</div>
+                </td>
+                <td style="padding: 1rem;">
+                    <span
+                        style="background: var(--bg-body); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.875rem;">
+                        {{ student.current_class.name }}
+                    </span>
+                </td>
+                <td style="padding: 1rem;">
+                    <div>{{ student.parent_phone }}</div>
+                    {% if student.parent_email %}
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">{{ student.parent_email }}</div>
+                    {% endif %}
+                </td>
+                <td class="text-danger" style="padding: 1rem; text-align: right; font-weight: 600; color: #EF4444;">
+                    KES {{ student.current_balance }}
+                </td>
+                <td style="padding: 1rem; text-align: right;">
+                    <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                        <a href="{% url 'record_payment' student.id %}"
+                            style="padding: 0.25rem 0.5rem; background: #D1FAE5; color: #059669; border-radius: 4px; font-size: 0.75rem; font-weight: 600; text-decoration: none;">
+                            Pay
+                        </a>
+                        <a href="{% url 'student_detail' student.id %}" style="color: var(--text-muted);"
+                            title="View Profile">
+                            <i class="ph ph-eye"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="padding: 3rem; text-align: center; color: var(--text-muted);">
+                    {% if min_amount or selected_class %}
+                    No students match these filters.
+                    {% else %}
+                    No students with outstanding balances found. Financial health is perfect!
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

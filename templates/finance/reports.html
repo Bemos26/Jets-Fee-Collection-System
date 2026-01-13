@@ -15,6 +15,9 @@
         <div>
             <div style="font-size: 0.9rem; color: var(--text-muted);">Collected Today</div>
             <div style="font-size: 2rem; font-weight: 700; color: var(--text-main);">KES {{ today_payments }}</div>
+            <a href="{% url 'daily_collection' %}"
+                style="font-size: 0.8rem; color: var(--primary-color); text-decoration: none; display: block; margin-top: 0.25rem;">View
+                Details &rarr;</a>
         </div>
     </div>
 
@@ -35,8 +38,10 @@
 <div class="card"
     style="background: white; padding: 1.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
     <h3
-        style="font-size: 1.1rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">
-        <i class="ph ph-user-list" style="margin-right: 0.5rem;"></i> Top Defaulters
+        style="font-size: 1.1rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+        <span><i class="ph ph-user-list" style="margin-right: 0.5rem;"></i> Top Defaulters</span>
+        <a href="{% url 'defaulters_list' %}"
+            style="font-size: 0.85rem; color: var(--primary-color); text-decoration: none;">View Full List &rarr;</a>
     </h3>
 
     <table style="width: 100%; border-collapse: collapse;">

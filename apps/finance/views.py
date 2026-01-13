@@ -1,14 +1,18 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.utils import timezone
-from .models import FeeStructure, Transaction
+from django.db.models import Sum, Q
+import datetime
 from .models import FeeStructure, Transaction
 from .forms import FeeStructureForm, FeeStructureCreateForm, PaymentForm
 
 from django.db import transaction, models
-from .models import FeeStructure, Transaction
 from apps.students.models import Student
+from apps.core.models import StudentClass
+
+def is_admin(user):
+    return user.is_authenticated and user.role in ['ADMIN', 'BURSAR']
 
 @login_required
 def fee_structure_list(request):
@@ -244,3 +248,66 @@ def bulk_invoice(request):
             messages.info(request, "Processed selected fees, but no new invoices were needed (everyone is up to date).")
             
     return redirect('fee_structure_list')
+
+@login_required
+def defaulters_list(request):
+    """
+    Detailed, filterable list of students with outstanding balances.
+    """
+    students = Student.objects.filter(current_balance__gt=0).select_related('current_class').order_by('-current_balance')
+    classes = StudentClass.objects.all().order_by('name')
+    
+    # Filters
+    class_id = request.GET.get('class_id')
+    min_amount = request.GET.get('min_amount')
+    
+    selected_class_id = int(class_id) if class_id and class_id.isdigit() else None
+    
+    for cls in classes:
+        cls.is_selected = (cls.id == selected_class_id)
+    
+    if selected_class_id:
+        students = students.filter(current_class_id=selected_class_id)
+        
+    if min_amount and min_amount.isdigit():
+        students = students.filter(current_balance__gte=int(min_amount))
+        
+    total_debt = students.aggregate(Sum('current_balance'))['current_balance__sum'] or 0
+        
+    context = {
+        'students': students,
+        'classes': classes,
+        'selected_class': selected_class_id,
+        'min_amount': min_amount,
+        'total_debt': total_debt,
+    }
+    return render(request, 'finance/report_defaulters.html', context)
+
+@login_required
+def daily_collection(request):
+    """
+    Detailed report of payments received on a specific date.
+    """
+    date_str = request.GET.get('date')
+    if date_str:
+        try:
+            selected_date = datetime.datetime.strptime(date_str, '%Y-%m-%d').date()
+        except ValueError:
+            selected_date = timezone.now().date()
+    else:
+        selected_date = timezone.now().date()
+        
+    transactions = Transaction.objects.filter(
+        transaction_type=Transaction.TransactionType.PAYMENT,
+        date__date=selected_date
+    ).select_related('student', 'student__current_class').order_by('-date')
+    
+    total_collected = transactions.aggregate(Sum('amount'))['amount__sum'] or 0
+    
+    context = {
+        'transactions': transactions,
+        'selected_date': selected_date,
+        'total_collected': total_collected,
+        'today': timezone.now().date(),
+    }
+    return render(request, 'finance/report_collection.html', context)

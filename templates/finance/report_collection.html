@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Daily Collection - Jets Fees{% endblock %}
+{% block page_title %}Daily Collection Report{% endblock %}
+
+{% block content %}
+<div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+    <!-- Summary Card -->
+    <div class="card"
+        style="background: white; padding: 1.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); flex: 1; display: flex; align-items: center; gap: 1.5rem;">
+        <div
+            style="width: 50px; height: 50px; background: var(--success-light); color: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+            <i class="ph ph-coins"></i>
+        </div>
+        <div>
+            <div style="font-size: 0.9rem; color: var(--text-muted);">Collected on {{ selected_date|date:"M d, Y" }}
+            </div>
+            <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-main);">KES {{ total_collected }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="card"
+    style="background: white; padding: 1.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
+    <!-- Filter Form -->
+    <form method="get"
+        style="display: flex; gap: 1rem; align-items: flex-end; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color);">
+        <div style="flex: 1;">
+            <label
+                style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-color); font-size: 0.9rem;">Select
+                Date</label>
+            <input type="date" name="date" value="{{ selected_date|date:'Y-m-d' }}" onchange="this.form.submit()"
+                style="width: 100%; border: 1px solid var(--border-color); padding: 0.5rem 1rem; border-radius: 4px;">
+        </div>
+        <div style="flex: 2; display: flex; align-items: flex-end; justify-content: flex-end;">
+            <a href="?date={{ today|date:'Y-m-d' }}"
+                style="padding: 0.5rem 1rem; background: var(--bg-body); border-radius: 4px; color: var(--text-color); text-decoration: none; font-size: 0.9rem; margin-right: 0.5rem;">Go
+                to Today</a>
+        </div>
+    </form>
+
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="text-align: left; color: var(--text-muted); border-bottom: 2px solid var(--border-color);">
+                <th style="padding: 1rem;">Receipt No. / Ref</th>
+                <th style="padding: 1rem;">Date & Time</th>
+                <th style="padding: 1rem;">Student</th>
+                <th style="padding: 1rem;">Description</th>
+                <th style="padding: 1rem; text-align: right;">Amount</th>
+                <th style="padding: 1rem; text-align: right;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in transactions %}
+            <tr style="border-bottom: 1px solid var(--border-color);">
+                <td style="padding: 1rem; font-family: monospace; font-size: 0.9rem;">{{ transaction.reference_number }}
+                </td>
+                <td style="padding: 1rem;">
+                    {{ transaction.date|date:"M d, H:i" }}
+                </td>
+                <td style="padding: 1rem; font-weight: 500;">
+                    <div>{{ transaction.student.full_name }}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">{{ transaction.student.current_class.name
+                        }}</div>
+                </td>
+                <td style="padding: 1rem;">{{ transaction.description }}</td>
+                <td class="text-success" style="padding: 1rem; text-align: right; font-weight: 600; color: #10B981;">
+                    + KES {{ transaction.amount }}
+                </td>
+                <td style="padding: 1rem; text-align: right;">
+                    <a href="{% url 'transaction_receipt' transaction.id %}" target="_blank"
+                        style="color: var(--primary-color);" title="Print Receipt">
+                        <i class="ph ph-printer"></i>
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="padding: 3rem; text-align: center; color: var(--text-muted);">
+                    No payments collected on this date.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

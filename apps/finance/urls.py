@@ -11,4 +11,6 @@ urlpatterns = [
     path('payment/add/<int:student_id>/', views.record_payment, name='record_payment'),
     path('receipt/<int:transaction_id>/', views.transaction_receipt, name='transaction_receipt'),
     path('reports/', views.reports_dashboard, name='reports'),
+    path('reports/defaulters/', views.defaulters_list, name='defaulters_list'),
+    path('reports/daily-collection/', views.daily_collection, name='daily_collection'),
 ]
