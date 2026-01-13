@@ -223,6 +223,7 @@
                         <th
                             style="padding: 0.75rem 1rem; text-align: right; font-size: 0.875rem; color: var(--text-muted);">
                             Amount</th>
+                        <th style="padding: 0.75rem 1rem; text-align: center; width: 50px;"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -243,6 +244,14 @@
                             {% if transaction.transaction_type == 'INVOICE' %}color: #EF4444;{% else %}color: #10B981;{% endif %}">
                             {% if transaction.transaction_type == 'INVOICE' %}-{% else %}+{% endif %} KES {{
                             transaction.amount|floatformat:2 }}
+                        </td>
+                        <td style="padding: 0.75rem 1rem; text-align: center;">
+                            {% if transaction.transaction_type == 'PAYMENT' %}
+                            <a href="{% url 'download_receipt' transaction.id %}" title="Download Receipt"
+                                style="color: var(--text-muted); text-decoration: none; font-size: 1.2rem;">
+                                <i class="ph ph-file-pdf"></i>
+                            </a>
+                            {% endif %}
                         </td>
                     </tr>
                     {% empty %}

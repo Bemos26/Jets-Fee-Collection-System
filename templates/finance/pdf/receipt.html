@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        @page {
+            size: a4 portrait;
+            margin: 2cm;
+
+            @frame footer_frame {
+                /* Another static Frame */
+                -pdf-frame-content: footerContent;
+                bottom: 1cm;
+                margin-left: 1cm;
+                margin-right: 1cm;
+                height: 1cm;
+            }
+        }
+
+        body {
+            font-family: Helvetica, sans-serif;
+            color: #333;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #2563EB;
+            padding-bottom: 1rem;
+        }
+
+        .school-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2563EB;
+        }
+
+        .school-address {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .receipt-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .info-grid {
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+
+        .info-grid td {
+            padding: 5px;
+            vertical-align: top;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .value {
+            font-size: 14px;
+        }
+
+        .amount-box {
+            background: #F3F4F6;
+            border: 1px solid #E5E7EB;
+            padding: 1rem;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .amount-val {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2563EB;
+        }
+
+        .footer {
+            font-size: 10px;
+            text-align: center;
+            color: #999;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="school-name">JETS HIGH SCHOOL</div>
+        <div class="school-address">P.O. Box 123, Education City | Tel: +254 700 000 000</div>
+    </div>
+
+    <div style="text-align: center;">
+        <div class="receipt-title">Payment Receipt</div>
+    </div>
+
+    <table class="info-grid">
+        <tr>
+            <td width="50%">
+                <div class="label">Receipt Number</div>
+                <div class="value">{{ transaction.reference_number }}</div>
+            </td>
+            <td width="50%" style="text-align: right;">
+                <div class="label">Date</div>
+                <div class="value">{{ transaction.date|date:"d M Y, H:i" }}</div>
+            </td>
+        </tr>
+    </table>
+
+    <table class="info-grid">
+        <tr>
+            <td width="50%">
+                <div class="label">Received From</div>
+                <div class="value">{{ transaction.student.full_name }}</div>
+                <div class="value" style="font-size: 12px; color: #666;">Adm: {{ transaction.student.admission_number }}
+                </div>
+                <div class="value" style="font-size: 12px; color: #666;">Class: {{
+                    transaction.student.current_class.name }}</div>
+            </td>
+            <td width="50%" style="text-align: right;">
+                <div class="label">Payment Method</div>
+                <div class="value">{{ transaction.description }}</div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="amount-box">
+        <div class="label">Amount Received</div>
+        <div class="amount-val">KES {{ transaction.amount|floatformat:2 }}</div>
+    </div>
+
+    <table class="info-grid">
+        <tr>
+            <td width="60%">
+                <div class="label">Total Balance Due</div>
+                <div class="value"
+                    style="color: {% if transaction.student.current_balance > 0 %}#DC2626{% else %}#059669{% endif %}; font-weight: bold;">
+                    KES {{ transaction.student.current_balance|floatformat:2 }}
+                </div>
+            </td>
+            <td width="40%" style="text-align: right; padding-top: 30px;">
+                <div style="border-bottom: 1px solid #333; width: 100%;"></div>
+                <div class="label" style="margin-top: 5px;">Bursar Signature</div>
+            </td>
+        </tr>
+    </table>
+
+    <div id="footerContent" style="text-align: center; color: #999; font-size: 10px;">
+        Generated on {% now "d M Y H:i" %} | Jets Fee Collection System
+    </div>
+</body>
+
+</html>

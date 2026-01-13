@@ -56,7 +56,7 @@
                     <th style="padding: 0.75rem;">Time</th>
                     <th style="padding: 0.75rem;">Student</th>
                     <th style="padding: 0.75rem; text-align: right;">Amount</th>
-                    <th style="padding: 0.75rem; text-align: right;">Receipt</th>
+                    <th style="padding: 0.75rem; text-align: center;">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -68,12 +68,22 @@
                         {{ tx.student.full_name }}
                         <div style="font-size: 0.75rem; color: var(--text-muted);">{{ tx.reference_number }}</div>
                     </td>
-                    <td style="padding: 0.75rem; text-align: right; font-weight: 600; color: var(--success);">+{{
-                        tx.amount }}</td>
-                    <td style="padding: 0.75rem; text-align: right;">
-                        <a href="{% url 'transaction_receipt' tx.id %}" target="_blank"
-                            style="color: var(--primary-color);"><i class="ph ph-printer"></i></a>
+                    <td style="padding: 0.75rem; text-align: right; font-weight: 600; color: #10B981;">
+                        KES {{ tx.amount|floatformat:2 }}
                     </td>
+                    <td style="padding: 0.75rem; text-align: center;">
+                        <a href="{% url 'download_receipt' tx.id %}" title="Download Receipt"
+                            style="color: var(--text-muted); text-decoration: none;">
+                            <i class="ph ph-file-pdf" style="font-size: 1.2rem;"></i>
+                        </a>
+                    </td>
+                </tr>
+                <td style="padding: 0.75rem; text-align: right; font-weight: 600; color: var(--success);">+{{
+                    tx.amount }}</td>
+                <td style="padding: 0.75rem; text-align: right;">
+                    <a href="{% url 'transaction_receipt' tx.id %}" target="_blank"
+                        style="color: var(--primary-color);"><i class="ph ph-printer"></i></a>
+                </td>
                 </tr>
                 {% empty %}
                 <tr>

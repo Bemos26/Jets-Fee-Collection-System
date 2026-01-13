@@ -9,7 +9,10 @@ urlpatterns = [
     path('fees/apply/<int:fee_id>/', views.apply_fee_structure, name='apply_fee_structure'),
     path('fees/bulk-invoice/', views.bulk_invoice, name='bulk_invoice'),
     path('payment/add/<int:student_id>/', views.record_payment, name='record_payment'),
+    
+    # Receipts & Reports
     path('receipt/<int:transaction_id>/', views.transaction_receipt, name='transaction_receipt'),
+    path('receipt/<int:transaction_id>/pdf/', views.download_receipt, name='download_receipt'),
     path('reports/', views.reports_dashboard, name='reports'),
     path('reports/defaulters/', views.defaulters_list, name='defaulters_list'),
     path('reports/daily-collection/', views.daily_collection, name='daily_collection'),

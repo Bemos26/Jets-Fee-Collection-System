@@ -6,6 +6,8 @@ from django.db.models import Sum, Q
 import datetime
 from .models import FeeStructure, Transaction
 from .forms import FeeStructureForm, FeeStructureCreateForm, PaymentForm
+from .utils import render_to_pdf
+from django.http import HttpResponse
 
 from django.db import transaction, models
 from apps.students.models import Student
@@ -316,3 +318,25 @@ def daily_collection(request):
         'today': timezone.now().date(),
     }
     return render(request, 'finance/report_collection.html', context)
+
+@login_required
+def download_receipt(request, transaction_id):
+    """
+    Generates a PDF receipt for a transaction.
+    """
+    transaction = get_object_or_404(Transaction, id=transaction_id)
+    
+    # Audit Log (Export action)
+    from apps.audit.utils import log_action
+    from apps.audit.models import AuditLog
+    log_action(request, transaction, AuditLog.Action.EXPORT, f"Downloaded receipt PDF")
+
+    pdf = render_to_pdf('finance/pdf/receipt.html', {'transaction': transaction})
+    
+    if pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        filename = f"Receipt_{transaction.reference_number}.pdf"
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+        
+    return HttpResponse("Error Rendering PDF", status=400)
