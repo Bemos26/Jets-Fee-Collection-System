@@ -162,5 +162,98 @@
         </div>
     </div>
 
+    <!-- Financial Overview -->
+    <div style="margin-top: 2rem;">
+        <h2 style="font-size: 1.25rem; font-weight: 600; color: var(--text-color); margin-bottom: 1rem;">Financial
+            Overview</h2>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;">
+            <!-- Balance Card -->
+            <div class="card"
+                style="background: white; padding: 1.5rem; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border-left: 4px solid {% if student.current_balance > 0 %}#EF4444{% elif student.current_balance < 0 %}#10B981{% else %}#6B7280{% endif %};">
+                <div style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Current Balance</div>
+                <div
+                    style="font-size: 1.5rem; font-weight: 700; color: {% if student.current_balance > 0 %}#EF4444{% elif student.current_balance < 0 %}#10B981{% else %}#6B7280{% endif %};">
+                    KES {{ student.current_balance|floatformat:2 }}
+                </div>
+            </div>
+
+            <!-- Total Invoiced -->
+            <div class="card"
+                style="background: white; padding: 1.5rem; border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
+                <div style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Total Billed</div>
+                <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-color);">
+                    KES {{ total_invoiced|floatformat:2 }}
+                </div>
+            </div>
+
+            <!-- Total Paid -->
+            <div class="card"
+                style="background: white; padding: 1.5rem; border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
+                <div style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Total Paid</div>
+                <div style="font-size: 1.5rem; font-weight: 700; color: #10B981;">
+                    KES {{ total_paid|floatformat:2 }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div style="margin-top: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2 style="font-size: 1.25rem; font-weight: 600; color: var(--text-color);">Recent Transactions</h2>
+            <!-- Placeholder for 'View All' link -->
+            <a href="#" style="color: var(--primary-color); font-size: 0.9rem; text-decoration: none;">View All</a>
+        </div>
+
+        <div class="card"
+            style="background: white; padding: 0.5rem; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border-color); background: var(--bg-body);">
+                        <th
+                            style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; color: var(--text-muted);">
+                            Date</th>
+                        <th
+                            style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; color: var(--text-muted);">
+                            Description</th>
+                        <th
+                            style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; color: var(--text-muted);">
+                            Type</th>
+                        <th
+                            style="padding: 0.75rem 1rem; text-align: right; font-size: 0.875rem; color: var(--text-muted);">
+                            Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in recent_transactions %}
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td style="padding: 0.75rem 1rem; font-size: 0.9rem;">{{ transaction.date|date:"M d, Y" }}</td>
+                        <td style="padding: 0.75rem 1rem; font-size: 0.9rem;">{{ transaction.description }}</td>
+                        <td style="padding: 0.75rem 1rem; font-size: 0.9rem;">
+                            <span style="padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600;
+                            {% if transaction.transaction_type == 'INVOICE' %}background: #FEE2E2; color: #EF4444;
+                            {% elif transaction.transaction_type == 'PAYMENT' %}background: #D1FAE5; color: #10B981;
+                            {% else %}background: #E5E7EB; color: #374151;{% endif %}">
+                                {{ transaction.get_transaction_type_display }}
+                            </span>
+                        </td>
+                        <td
+                            style="padding: 0.75rem 1rem; text-align: right; font-weight: 600; font-size: 0.9rem;
+                            {% if transaction.transaction_type == 'INVOICE' %}color: #EF4444;{% else %}color: #10B981;{% endif %}">
+                            {% if transaction.transaction_type == 'INVOICE' %}-{% else %}+{% endif %} KES {{
+                            transaction.amount|floatformat:2 }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="padding: 2rem; text-align: center; color: var(--text-muted);">No
+                            transactions found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 {% endblock %}

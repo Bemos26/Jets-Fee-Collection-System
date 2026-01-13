@@ -10,14 +10,47 @@ from .forms import StudentForm
 def is_admin(user):
     return user.role in [User.Role.ADMIN, User.Role.BURSAR, User.Role.TEACHER]
 
+from django.core.paginator import Paginator
+from django.db.models import Q
+from apps.core.models import StudentClass
+
 @login_required
 @user_passes_test(is_admin)
 def student_list(request):
     """
-    Displays a list of all students. Admins only.
+    Displays a list of all students with search, filter, and pagination.
     """
+    query = request.GET.get('q', '')
+    class_filter = request.GET.get('class_id', '')
+    
     students = Student.objects.select_related('current_class').all().order_by('current_class', 'first_name')
-    context = {'students': students}
+    
+    # Search
+    if query:
+        students = students.filter(
+            Q(first_name__icontains=query) | 
+            Q(last_name__icontains=query) | 
+            Q(admission_number__icontains=query)
+        )
+        
+    # Filter by Class
+    if class_filter and class_filter.isdigit():
+        students = students.filter(current_class_id=int(class_filter))
+        
+    # Pagination
+    paginator = Paginator(students, 20) # 20 students per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Get all classes for the filter dropdown
+    classes = StudentClass.objects.all().order_by('name')
+    
+    context = {
+        'students': page_obj,
+        'search_query': query,
+        'selected_class': int(class_filter) if class_filter.isdigit() else None,
+        'classes': classes,
+    }
     return render(request, 'students/student_list.html', context)
 
 @login_required
@@ -131,11 +164,33 @@ def student_update(request, student_id):
         
     return render(request, 'students/student_form.html', {'form': form, 'title': 'Edit Student'})
 
+from django.db.models import Sum
+
 @login_required
 @user_passes_test(is_admin)
 def student_detail(request, student_id):
     student = get_object_or_404(Student, id=student_id)
-    return render(request, 'students/student_detail.html', {'student': student})
+    
+    # Financial Overview
+    total_invoiced = student.transactions.filter(
+        transaction_type=Transaction.TransactionType.INVOICE
+    ).aggregate(Sum('amount'))['amount__sum'] or 0
+    
+    # Payments + Waivers
+    total_paid = student.transactions.filter(
+        transaction_type__in=[Transaction.TransactionType.PAYMENT, Transaction.TransactionType.WAIVER]
+    ).aggregate(Sum('amount'))['amount__sum'] or 0
+    
+    # Recent Transactions
+    recent_transactions = student.transactions.all().order_by('-date')[:5]
+    
+    context = {
+        'student': student,
+        'total_invoiced': total_invoiced,
+        'total_paid': total_paid,
+        'recent_transactions': recent_transactions,
+    }
+    return render(request, 'students/student_detail.html', context)
 
 @login_required
 @user_passes_test(is_admin)
