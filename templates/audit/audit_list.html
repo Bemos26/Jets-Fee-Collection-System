@@ -7,20 +7,29 @@
 <div class="card"
     style="background: white; padding: 1.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
 
+    <style>
+        .audit-badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+        .audit-badge.create { background: #DCFCE7; color: #16A34A; }
+        .audit-badge.update { background: #DBEAFE; color: #2563EB; }
+        .audit-badge.delete { background: #FEE2E2; color: #EF4444; }
+        .audit-badge.payment { background: #FEF3C7; color: #D97706; }
+        .audit-badge.other { background: var(--bg-body); color: var(--text-muted); }
+    </style>
+
     <!-- Filters -->
     <form method="get"
         style="display: flex; gap: 1rem; margin-bottom: 2rem; padding: 1rem; background: var(--bg-body); border-radius: 8px;">
         <select name="action" style="padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px;">
             <option value="">All Actions</option>
-            {% for value, label in actions.choices %}
-            <option value="{{ value }}" {% if selected_action==value %}selected{% endif %}>{{ label }}</option>
+            {% for value, label in actions %}
+            <option value="{{ value }}" {% if selected_action == value %}selected{% endif %}>{{ label }}</option>
             {% endfor %}
         </select>
 
         <select name="actor" style="padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px;">
             <option value="">All Users</option>
             {% for u in users %}
-            <option value="{{ u.id }}" {% if selected_actor==u.id %}selected{% endif %}>{{ u.username }}</option>
+            <option value="{{ u.id }}" {% if selected_actor == u.id %}selected{% endif %}>{{ u.username }}</option>
             {% endfor %}
         </select>
 
@@ -51,35 +60,25 @@
                     <td style="padding: 1rem;">
                         {% if log.actor %}
                         <span style="font-weight: 500;">{{ log.actor.username }}</span>
-                        <span style="font-size: 0.75rem; color: var(--text-muted); display: block;">{{
-                            log.actor.get_role_display }}</span>
+                        <span style="font-size: 0.75rem; color: var(--text-muted); display: block;">{{ log.actor.get_role_display }}</span>
                         {% else %}
                         <span style="color: var(--text-muted);">System/Unknown</span>
                         {% endif %}
                     </td>
                     <td style="padding: 1rem;">
-                        <span style="
-                            padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600;
-                            {% if log.action == 'DELETE' %}background: #FEE2E2; color: #EF4444;
-                            {% elif log.action == 'CREATE' %}background: #DCFCE7; color: #16A34A;
-                            {% elif log.action == 'UPDATE' %}background: #DBEAFE; color: #2563EB;
-                            {% elif log.action == 'PAYMENT' %}background: #FEF3C7; color: #D97706;
-                            {% else %}background: var(--bg-body); color: var(--text-muted);{% endif %}
-                        ">
+                        <span class="audit-badge {{ log.action|lower|default:'other' }}">
                             {{ log.get_action_display }}
                         </span>
                     </td>
                     <td style="padding: 1rem;">
                         <strong>{{ log.target_model }}</strong>
-                        <div style="font-size: 0.8rem; color: var(--text-muted);">ID: {{
-                            log.target_object_id|default:"-" }}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">ID: {{ log.target_object_id|default:"-" }}</div>
                     </td>
                     <td style="padding: 1rem; max-width: 300px;">
                         <div style="font-weight: 500;">{{ log.target_repr|default:"" }}</div>
                         <div style="color: var(--text-muted);">{{ log.details|default:"" }}</div>
                     </td>
-                    <td style="padding: 1rem; color: var(--text-muted); font-family: monospace;">{{
-                        log.ip_address|default:"-" }}</td>
+                    <td style="padding: 1rem; color: var(--text-muted); font-family: monospace;">{{ log.ip_address|default:"-" }}</td>
                 </tr>
                 {% empty %}
                 <tr>

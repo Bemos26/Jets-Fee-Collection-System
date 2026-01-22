@@ -24,7 +24,7 @@ def audit_view(request):
         
     context = {
         'logs': logs[:100], # Limit to last 100 for performance for now
-        'actions': AuditLog.Action,
+        'actions': AuditLog.Action.choices,
         'users': User.objects.filter(is_active=True).order_by('username'),
         'selected_action': action,
         'selected_actor': int(actor_id) if actor_id and actor_id.isdigit() else None

@@ -166,7 +166,33 @@ def record_payment(request, student_id):
             # Audit Log
             from apps.audit.utils import log_action
             from apps.audit.models import AuditLog
-            log_action(request, student, AuditLog.Action.PAYMENT, f"Received {amount} from {student.role} via {description or 'Standard Payment'}")
+            log_action(request, student, AuditLog.Action.PAYMENT, f"Received {amount} from Student via {description or 'Standard Payment'}")
+            
+            # Notifications (SMS & Email)
+            from apps.notifications.services import NotificationService
+            
+            # 1. SMS
+            if student.parent_phone:
+                msg = f"Receipt: {settings.SCHOOL_NAME} Received KES {amount} for {student.full_name}. Balance: KES {student.current_balance}. Ref: {reference}"
+                NotificationService.send_sms(student.parent_phone, msg)
+                
+            # 2. Email (with Receipt Attachment)
+            if student.parent_email:
+                # Generate PDF in memory
+                transaction_obj = Transaction.objects.get(reference_number=reference)
+                pdf_content = render_to_pdf('finance/pdf/receipt.html', {'transaction': transaction_obj})
+                
+                attachment = None
+                if pdf_content:
+                    attachment = (f"Receipt_{reference}.pdf", pdf_content.content, 'application/pdf')
+
+                NotificationService.send_email(
+                    recipient_email=student.parent_email,
+                    subject=f"Payment Receipt - {reference}",
+                    template_name='finance/email/payment_receipt.html', # We need to create this simple template
+                    context={'student': student, 'amount': amount, 'reference': reference},
+                    attachment=attachment
+                )
             
             messages.success(request, f"Payment of KES {amount} recorded for {student.full_name}")
             return redirect('student_detail', student_id=student.id)
